@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Labs{% endblock %}
+
+{% block body %}
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-name">EduMonitor</div>
+      <div class="brand-sub">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="{% url 'admin_dashboard' %}" class="nav-item">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <div class="nav-section-label">Management</div>
+      <a href="{% url 'admin_teacher_manage' %}" class="nav-item">
+        <span class="nav-icon">👨‍🏫</span> Manage Teachers
+      </a>
+      <a href="{% url 'admin_teacher_status' %}" class="nav-item">
+        <span class="nav-icon">📡</span> Teacher Status
+      </a>
+      <a href="{% url 'admin_lab_manage' %}" class="nav-item active">
+        <span class="nav-icon">🖥️</span> Manage Labs
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="nav-item" style="color:var(--danger);">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <button class="btn btn-ghost btn-sm" id="sidebarToggle" style="display:none; margin-bottom:16px;">☰ Menu</button>
+
+    <div class="page-header">
+      <h1>Manage Labs</h1>
+      <p>Add, view, or remove computer labs and their reports</p>
+    </div>
+
+    <!-- Add Lab Form -->
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="card-title">➕ Add New Lab</div>
+      </div>
+      <form method="POST" action="{% url 'add_lab' %}">
+        {% csrf_token %}
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label" for="lab_id">Lab ID</label>
+            <input type="text" id="lab_id" name="lab_id" class="form-control" placeholder="e.g. LAB-101" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="name">Lab Name</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="Computer Lab 1" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Strong password" required />
+          </div>
+        </div>
+        <p class="text-xs text-muted mb-4">Password must include letters, numbers, and special characters.</p>
+        <button type="submit" class="btn btn-success">✅ Add Lab</button>
+      </form>
+    </div>
+
+    <!-- Labs List -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🖥️ Registered Labs</div>
+        <span class="badge badge-info">{{ labs|length }} labs</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Lab ID</th>
+              <th>Name</th>
+              <th>Reports</th>
+              <th>Systems</th>
+              <th>Issues</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lab in labs %}
+            <tr>
+              <td style="font-weight:600; color:var(--accent);">{{ lab.id }}</td>
+              <td>{{ lab.name }}</td>
+              <td><span class="badge badge-info">{{ lab.reports }}</span></td>
+              <td>{{ lab.systems }}</td>
+              <td>
+                {% if lab.issues > 0 %}
+                  <span class="badge badge-danger">⚠️ {{ lab.issues }}</span>
+                {% else %}
+                  <span class="badge badge-available">✅ 0</span>
+                {% endif %}
+              </td>
+              <td class="flex gap-2">
+                <a href="{% url 'lab_reports' lab.id %}" class="btn btn-ghost btn-sm">📋 Reports</a>
+                <button class="btn btn-accent btn-sm" onclick="viewLabDetails('{{ lab.id }}')">👁️ View</button>
+                <a href="{% url 'remove_lab' lab.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Remove lab {{ lab.id }}?')">🗑️</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted" style="padding:40px;">No labs registered yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Lab Details Modal -->
+<div class="modal-overlay" id="labModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalLabName">Lab Details</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalContent">
+      <p class="text-muted">Loading...</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media (max-width: 768px) { #sidebarToggle { display: inline-flex !important; } }
+</style>
+
+{% endblock body %}
+
+{% block extra_scripts %}
+<script>
+function viewLabDetails(labId) {
+  const modal = document.getElementById('labModal');
+  modal.classList.add('active');
+  document.getElementById('modalContent').innerHTML = '<p class="text-muted">Loading...</p>';
+
+  fetch('/admin/lab/' + labId + '/')
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) {
+        document.getElementById('modalContent').innerHTML = '<p class="text-muted">' + data.error + '</p>';
+        return;
+      }
+      document.getElementById('modalLabName').textContent = data.lab_name + ' (' + data.lab_id + ')';
+      let html = '<div class="stats-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:20px;">';
+      html += '<div class="stat-card"><div class="stat-value">' + data.reports_count + '</div><div class="stat-label">Reports</div></div>';
+      html += '<div class="stat-card"><div class="stat-value">' + data.systems + '</div><div class="stat-label">Systems</div></div>';
+      html += '<div class="stat-card"><div class="stat-value">' + data.issues + '</div><div class="stat-label">Issues</div></div>';
+      html += '</div>';
+
+      if (data.reports && Object.keys(data.reports).length > 0) {
+        html += '<div class="card-title mb-4">Recent Reports</div>';
+        html += '<div class="table-wrapper"><table><thead><tr><th>Timestamp</th><th>Monitors</th><th>CPU</th><th>Mouse</th><th>Keyboard</th><th>Switches</th></tr></thead><tbody>';
+        for (const [ts, rep] of Object.entries(data.reports).slice(0, 10)) {
+          html += '<tr><td>' + ts + '</td>';
+          html += '<td>' + (rep.Monitors || 0) + '</td>';
+          html += '<td>' + (rep.CPU || 0) + '</td>';
+          html += '<td>' + (rep.Mouse || 0) + '</td>';
+          html += '<td>' + (rep.Keyboard || 0) + '</td>';
+          html += '<td>' + (rep.Switches || 0) + '</td></tr>';
+        }
+        html += '</tbody></table></div>';
+      } else {
+        html += '<p class="text-muted text-center mt-4">No reports submitted yet.</p>';
+      }
+      document.getElementById('modalContent').innerHTML = html;
+    })
+    .catch(err => {
+      document.getElementById('modalContent').innerHTML = '<p style="color:var(--danger);">Error loading data.</p>';
+    });
+}
+
+function closeModal() {
+  document.getElementById('labModal').classList.remove('active');
+}
+
+document.getElementById('labModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+{% endblock extra_scripts %}
+

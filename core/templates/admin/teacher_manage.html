@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Teachers{% endblock %}
+
+{% block body %}
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-name">EduMonitor</div>
+      <div class="brand-sub">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="{% url 'admin_dashboard' %}" class="nav-item">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <div class="nav-section-label">Management</div>
+      <a href="{% url 'admin_teacher_manage' %}" class="nav-item active">
+        <span class="nav-icon">👨‍🏫</span> Manage Teachers
+      </a>
+      <a href="{% url 'admin_teacher_status' %}" class="nav-item">
+        <span class="nav-icon">📡</span> Teacher Status
+      </a>
+      <a href="{% url 'admin_lab_manage' %}" class="nav-item">
+        <span class="nav-icon">🖥️</span> Manage Labs
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="nav-item" style="color:var(--danger);">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <button class="btn btn-ghost btn-sm" id="sidebarToggle" style="display:none; margin-bottom:16px;">☰ Menu</button>
+
+    <div class="page-header">
+      <h1>Manage Teachers</h1>
+      <p>Add, view, or remove teaching staff</p>
+    </div>
+
+    <!-- Add Teacher Form -->
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="card-title">➕ Add New Teacher</div>
+      </div>
+      <form method="POST" action="{% url 'add_teacher' %}">
+        {% csrf_token %}
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label" for="short_code">Short Code</label>
+            <input type="text" id="short_code" name="short_code" class="form-control" placeholder="e.g. ABC" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="Teacher Name" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Strong password" required />
+          </div>
+        </div>
+        <p class="text-xs text-muted mb-4">Password must include letters, numbers, and special characters.</p>
+        <button type="submit" class="btn btn-primary">✅ Add Teacher</button>
+      </form>
+    </div>
+
+    <!-- Teachers List -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👨‍🏫 Registered Teachers</div>
+        <span class="badge badge-info">{{ teachers|length }} total</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for code, teacher in teachers.items %}
+            <tr>
+              <td style="font-weight:600; color:var(--primary-light);">{{ code }}</td>
+              <td>{{ teacher.name }}</td>
+              <td>
+                {% if "ON LEAVE" in teacher.status|upper %}
+                  <span class="badge badge-leave">🏖️ On Leave</span>
+                {% elif "AVAILABLE" in teacher.status|upper %}
+                  <span class="badge badge-available">✅ Available</span>
+                {% else %}
+                  <span class="badge badge-info">{{ teacher.status|default:"No status" }}</span>
+                {% endif %}
+              </td>
+              <td class="text-muted text-sm">{{ teacher.last_updated|default:"Never" }}</td>
+              <td>
+                <a href="{% url 'remove_teacher' code %}" class="btn btn-danger btn-sm" onclick="return confirm('Remove teacher {{ code }}?')">
+                  🗑️ Remove
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted" style="padding:40px;">No teachers registered yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  @media (max-width: 768px) { #sidebarToggle { display: inline-flex !important; } }
+</style>
+{% endblock %}

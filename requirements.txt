@@ -1,0 +1,12 @@
+# ═══════════════════════════════════════════════════════════════
+# Monitoring System — Python Dependencies
+# Django 4.2 LTS (Recommended for PythonAnywhere & Production)
+# ═══════════════════════════════════════════════════════════════
+
+Django>=4.2,<5.0
+pyrebase4>=4.7.0
+firebase-admin>=6.2.0
+python-dotenv>=1.0.0
+gunicorn>=21.2.0
+requests>=2.31.0
+cryptography>=41.0.0

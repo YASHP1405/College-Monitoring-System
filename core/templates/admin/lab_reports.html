@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lab Reports — {{ lab.name }}{% endblock %}
+
+{% block body %}
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-name">EduMonitor</div>
+      <div class="brand-sub">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="{% url 'admin_dashboard' %}" class="nav-item">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <div class="nav-section-label">Management</div>
+      <a href="{% url 'admin_teacher_manage' %}" class="nav-item">
+        <span class="nav-icon">👨‍🏫</span> Manage Teachers
+      </a>
+      <a href="{% url 'admin_teacher_status' %}" class="nav-item">
+        <span class="nav-icon">📡</span> Teacher Status
+      </a>
+      <a href="{% url 'admin_lab_manage' %}" class="nav-item active">
+        <span class="nav-icon">🖥️</span> Manage Labs
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="nav-item" style="color:var(--danger);">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <button class="btn btn-ghost btn-sm" id="sidebarToggle" style="display:none; margin-bottom:16px;">☰ Menu</button>
+
+    <div class="page-header flex items-center justify-between">
+      <div>
+        <h1>📋 {{ lab.name }} Reports</h1>
+        <p>Lab ID: <strong>{{ lab.id }}</strong> · Systems: {{ lab.systems }} · Issues: {{ lab.issues }}</p>
+      </div>
+      <a href="{% url 'admin_lab_manage' %}" class="btn btn-ghost">← Back to Labs</a>
+    </div>
+
+    {% for month, days in reports.items %}
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="card-title">📅 {{ month }}</div>
+      </div>
+
+      {% for day, entries in days.items %}
+      <div class="mb-4">
+        <div class="text-sm font-bold text-secondary mb-2" style="padding-left:4px;">{{ day }}</div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Monitors</th>
+                <th>CPU</th>
+                <th>Mouse</th>
+                <th>Keyboard</th>
+                <th>Switches</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for timestamp, report in entries.items %}
+              <tr>
+                <td class="text-sm">{{ timestamp }}</td>
+                <td>{% if report.Monitors > 0 %}<span class="badge badge-danger">{{ report.Monitors }}</span>{% else %}0{% endif %}</td>
+                <td>{% if report.CPU > 0 %}<span class="badge badge-danger">{{ report.CPU }}</span>{% else %}0{% endif %}</td>
+                <td>{% if report.Mouse > 0 %}<span class="badge badge-danger">{{ report.Mouse }}</span>{% else %}0{% endif %}</td>
+                <td>{% if report.Keyboard > 0 %}<span class="badge badge-danger">{{ report.Keyboard }}</span>{% else %}0{% endif %}</td>
+                <td>{% if report.Switches > 0 %}<span class="badge badge-danger">{{ report.Switches }}</span>{% else %}0{% endif %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% empty %}
+    <div class="card text-center text-muted" style="padding:60px 20px;">
+      <div style="font-size:3rem; margin-bottom:12px;">📋</div>
+      No reports found for this lab.
+    </div>
+    {% endfor %}
+  </main>
+</div>
+
+<style>
+  @media (max-width: 768px) { #sidebarToggle { display: inline-flex !important; } }
+</style>
+{% endblock %}

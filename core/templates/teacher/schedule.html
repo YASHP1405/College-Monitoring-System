@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Schedule{% endblock %}
+
+{% block body %}
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">👨‍🏫</div>
+      <div class="brand-name">EduMonitor</div>
+      <div class="brand-sub">Teacher Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Navigation</div>
+      <a href="{% url 'teacher_dashboard' %}" class="nav-item">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="{% url 'teacher_schedule' %}" class="nav-item active">
+        <span class="nav-icon">📅</span> My Schedule
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="nav-item" style="color:var(--danger);">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <button class="btn btn-ghost btn-sm" id="sidebarToggle" style="display:none; margin-bottom:16px;">☰ Menu</button>
+
+    <div class="page-header">
+      <h1>📅 Weekly Schedule</h1>
+      <p>Manage your class timetable for each day</p>
+    </div>
+
+    <!-- Add Schedule Entry -->
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="card-title">➕ Add / Update Schedule Entry</div>
+      </div>
+      <form method="POST" action="{% url 'teacher_schedule' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add" />
+        <div class="grid-4">
+          <div class="form-group">
+            <label class="form-label" for="day">Day</label>
+            <select id="day" name="day" class="form-control" required>
+              <option value="">Select Day</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="time_slot">Time Slot</label>
+            <input type="text" id="time_slot" name="time_slot" class="form-control" placeholder="e.g. 09:00-10:00" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="room">Room</label>
+            <input type="text" id="room" name="room" class="form-control" placeholder="e.g. Room 301" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" class="form-control" placeholder="e.g. Data Structures" required />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">✅ Add Entry</button>
+      </form>
+    </div>
+
+    <!-- Schedule Table per Day -->
+    {% for day, slots in schedule.items %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <div class="card-title">📆 {{ day }}</div>
+        <span class="badge badge-info">{{ slots|length }} lecture{{ slots|length|pluralize:"s" }}</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Time Slot</th>
+              <th>Room</th>
+              <th>Subject</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot, info in slots.items %}
+            <tr>
+              <td style="font-weight:600;">{{ slot }}</td>
+              <td>
+                {% if info.room %}{{ info.room }}{% else %}{{ info }}{% endif %}
+              </td>
+              <td>
+                {% if info.subject %}{{ info.subject }}{% else %}—{% endif %}
+              </td>
+              <td>
+                <form method="POST" action="{% url 'teacher_schedule' %}" style="display:inline;">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="delete" />
+                  <input type="hidden" name="day" value="{{ day }}" />
+                  <input type="hidden" name="time_slot" value="{{ slot }}" />
+                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete {{ day }} {{ slot }}?')">
+                    🗑️ Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% empty %}
+    <div class="card text-center text-muted" style="padding:60px 20px;">
+      <div style="font-size:3rem; margin-bottom:12px;">📅</div>
+      No schedule entries yet. Add your first class above!
+    </div>
+    {% endfor %}
+  </main>
+</div>
+
+<style>
+  @media (max-width: 768px) { #sidebarToggle { display: inline-flex !important; } }
+</style>
+{% endblock %}

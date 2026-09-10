@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lab Dashboard{% endblock %}
+
+{% block body %}
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🖥️</div>
+      <div class="brand-name">EduMonitor</div>
+      <div class="brand-sub">Lab Portal — {{ lab.name }}</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Navigation</div>
+      <a href="{% url 'lab_dashboard' %}" class="nav-item active">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="nav-item" style="color:var(--danger);">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <button class="btn btn-ghost btn-sm" id="sidebarToggle" style="display:none; margin-bottom:16px;">☰ Menu</button>
+
+    <div class="page-header">
+      <h1>🖥️ {{ lab.name }} Dashboard</h1>
+      <p>Lab ID: <strong>{{ lab.id }}</strong> · Systems: {{ lab.systems }}</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card" style="--gradient: linear-gradient(90deg, var(--primary), var(--accent));">
+        <div class="stat-icon">🖥️</div>
+        <div class="stat-value">{{ lab.systems }}</div>
+        <div class="stat-label">Total Systems</div>
+      </div>
+      <div class="stat-card" style="--gradient: linear-gradient(90deg, var(--danger), #c9184a);">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-value">{{ lab.issues }}</div>
+        <div class="stat-label">Open Issues</div>
+      </div>
+    </div>
+
+    <!-- Submit New Report -->
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="card-title">📝 Submit Equipment Report</div>
+      </div>
+      <form method="POST" action="{% url 'lab_dashboard' %}">
+        {% csrf_token %}
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label" for="Monitors">🖥️ Monitors (Faulty)</label>
+            <input type="number" id="Monitors" name="Monitors" class="form-control" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="CPU">💻 CPU (Faulty)</label>
+            <input type="number" id="CPU" name="CPU" class="form-control" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="Mouse">🖱️ Mouse (Faulty)</label>
+            <input type="number" id="Mouse" name="Mouse" class="form-control" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="Keyboard">⌨️ Keyboard (Faulty)</label>
+            <input type="number" id="Keyboard" name="Keyboard" class="form-control" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="Switches">🔌 Switches (Faulty)</label>
+            <input type="number" id="Switches" name="Switches" class="form-control" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="OtherIssues">📋 Other Issues</label>
+            <input type="text" id="OtherIssues" name="OtherIssues" class="form-control" placeholder="Optional description" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">✅ Submit Report</button>
+      </form>
+    </div>
+
+    <!-- Report History -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 Report History</div>
+      </div>
+
+      {% for month, days in reports.items %}
+      <div class="mb-6">
+        <h3 style="font-size:1rem; color:var(--primary-light); margin-bottom:12px;">📅 {{ month }}</h3>
+
+        {% for day, entries in days.items %}
+        <div class="mb-4" style="padding-left:8px;">
+          <div class="text-sm font-bold text-secondary mb-2">{{ day }}</div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Monitors</th>
+                  <th>CPU</th>
+                  <th>Mouse</th>
+                  <th>Keyboard</th>
+                  <th>Switches</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for timestamp, report in entries.items %}
+                <tr id="row-{{ forloop.counter }}">
+                  <td class="text-sm">{{ timestamp }}</td>
+                  <td>{{ report.Monitors }}</td>
+                  <td>{{ report.CPU }}</td>
+                  <td>{{ report.Mouse }}</td>
+                  <td>{{ report.Keyboard }}</td>
+                  <td>{{ report.Switches }}</td>
+                  <td>
+                    <button class="btn btn-danger btn-sm" onclick="deleteReport('{{ timestamp }}', this)">
+                      🗑️ Delete
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% empty %}
+      <div class="text-center text-muted" style="padding:40px;">
+        <div style="font-size:3rem; margin-bottom:12px;">📋</div>
+        No reports submitted yet. Submit your first one above!
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+</div>
+
+<style>
+  @media (max-width: 768px) { #sidebarToggle { display: inline-flex !important; } }
+</style>
+{% endblock body %}
+
+{% block extra_scripts %}
+<script>
+function deleteReport(timestamp, btn) {
+  if (!confirm('Delete report from ' + timestamp + '?')) return;
+
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+  const formData = new FormData();
+  formData.append('timestamp', timestamp);
+  formData.append('csrfmiddlewaretoken', csrfToken);
+
+  fetch('{% url "remove_lab_report" %}', {
+    method: 'POST',
+    body: formData,
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      const row = btn.closest('tr');
+      row.style.opacity = '0';
+      row.style.transform = 'translateX(40px)';
+      row.style.transition = 'all 0.3s ease';
+      setTimeout(() => row.remove(), 300);
+    } else {
+      alert('Error: ' + (data.error || 'Unknown error'));
+    }
+  })
+  .catch(() => alert('Network error. Please try again.'));
+}
+</script>
+{% endblock extra_scripts %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block body %}
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-name">EduMonitor</div>
+      <div class="brand-sub">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="{% url 'admin_dashboard' %}" class="nav-item active">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+
+      <div class="nav-section-label">Management</div>
+      <a href="{% url 'admin_teacher_manage' %}" class="nav-item">
+        <span class="nav-icon">👨‍🏫</span> Manage Teachers
+      </a>
+      <a href="{% url 'admin_teacher_status' %}" class="nav-item">
+        <span class="nav-icon">📡</span> Teacher Status
+      </a>
+      <a href="{% url 'admin_lab_manage' %}" class="nav-item">
+        <span class="nav-icon">🖥️</span> Manage Labs
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="nav-item" style="color: var(--danger);">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <button class="btn btn-ghost btn-sm" id="sidebarToggle" style="display:none; margin-bottom:16px;">☰ Menu</button>
+
+    <div class="page-header">
+      <h1>Admin Dashboard</h1>
+      <p>System overview — manage your institution's resources</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card" style="--gradient: linear-gradient(90deg, #6c63ff, #8b83ff);">
+        <div class="stat-icon">👨‍🏫</div>
+        <div class="stat-value">{{ teachers|length }}</div>
+        <div class="stat-label">Teachers</div>
+      </div>
+      <div class="stat-card" style="--gradient: linear-gradient(90deg, #00d4ff, #0096c7);">
+        <div class="stat-icon">🖥️</div>
+        <div class="stat-value">{{ labs|length }}</div>
+        <div class="stat-label">Labs</div>
+      </div>
+      <div class="stat-card" style="--gradient: linear-gradient(90deg, #00e5a0, #00b37e);">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-value">{{ students|length }}</div>
+        <div class="stat-label">Students</div>
+      </div>
+      <div class="stat-card" style="--gradient: linear-gradient(90deg, #ff6b9d, #c9184a);">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value"><span class="live-dot"></span></div>
+        <div class="stat-label">System Online</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚡ Quick Actions</div>
+      </div>
+      <div class="grid-4">
+        <a href="{% url 'admin_teacher_manage' %}" class="btn btn-primary w-full">👨‍🏫 Manage Teachers</a>
+        <a href="{% url 'admin_teacher_status' %}" class="btn btn-accent w-full">📡 View Status</a>
+        <a href="{% url 'admin_lab_manage' %}" class="btn btn-success w-full">🖥️ Manage Labs</a>
+        <a href="{% url 'logout' %}" class="btn btn-danger w-full">🚪 Logout</a>
+      </div>
+    </div>
+
+    <!-- Teachers Overview -->
+    <div class="card mt-6">
+      <div class="card-header">
+        <div class="card-title">👨‍🏫 Teachers Overview</div>
+        <span class="badge badge-info">{{ teachers|length }} registered</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for code, teacher in teachers.items %}
+            <tr>
+              <td style="font-weight:600; color:var(--primary-light);">{{ code }}</td>
+              <td>{{ teacher.name }}</td>
+              <td>
+                {% if "ON LEAVE" in teacher.status|upper %}
+                  <span class="badge badge-leave">🏖️ {{ teacher.status }}</span>
+                {% elif "AVAILABLE" in teacher.status|upper %}
+                  <span class="badge badge-available">✅ {{ teacher.status }}</span>
+                {% else %}
+                  <span class="badge badge-info">{{ teacher.status }}</span>
+                {% endif %}
+              </td>
+              <td class="text-muted text-sm">{{ teacher.last_updated }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted" style="padding:40px;">No teachers registered yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  @media (max-width: 768px) { #sidebarToggle { display: inline-flex !important; } }
+</style>
+{% endblock %}
