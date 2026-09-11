@@ -34,7 +34,7 @@ def login_view(request):
             hashed = hash_password(password)
 
             # 1. Check if login_input is an email address
-            resolved_id = login_input
+            resolved_id = None
             resolved_role = None
 
             if "@" in login_input:
@@ -48,7 +48,7 @@ def login_view(request):
                         resolved_role = "student"
                         break
 
-                # Check teachers by email if not found
+                # Check teachers by email
                 if not resolved_role:
                     teachers = db.child("teachers").get().val() or {}
                     for tid, tdata in teachers.items():
@@ -56,6 +56,22 @@ def login_view(request):
                             resolved_id = tid
                             resolved_role = "teacher"
                             break
+
+                # Check admins by email
+                if not resolved_role:
+                    admins = db.child("admins").get().val() or {}
+                    for aid, adata in admins.items():
+                        if isinstance(adata, dict) and adata.get("email", "").lower() == email_lower:
+                            resolved_id = aid
+                            resolved_role = "admin"
+                            break
+
+                # If email was not found anywhere
+                if not resolved_id:
+                    messages.error(request, f"❌ No account found for email '{login_input}'. Please check your email or create an account below.")
+                    return redirect(reverse("login"))
+            else:
+                resolved_id = login_input
 
             # 2. Check Admin
             admin = db.child("admins").child(resolved_id).get().val()
