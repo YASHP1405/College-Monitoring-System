@@ -123,8 +123,20 @@ if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your-firebase-api-key') 
         .catch((error) => {
           btn.disabled = false;
           btn.innerHTML = originalText;
-          if (error.code !== 'auth/popup-closed-by-user') {
-            alert('Google authentication error: ' + error.message);
+          console.error("Firebase Auth Error:", error);
+
+          if (error.code === 'auth/popup-closed-by-user') {
+            return;
+          }
+
+          if (error.code === 'auth/operation-not-allowed' || error.code === 'auth/configuration-not-found') {
+            alert('⚠️ Google Sign-In is not enabled yet in your Firebase Console!\n\nTo fix:\n1. Go to Firebase Console > Authentication > Sign-in method\n2. Click "Google"\n3. Toggle "Enable"\n4. Select your support email and click "Save".');
+          } else if (error.code === 'auth/unauthorized-domain') {
+            alert('⚠️ Domain not authorized in Firebase!\n\nTo fix:\n1. Open http://localhost:8000/ instead of 127.0.0.1\nOR\n2. Add 127.0.0.1 in Firebase Console > Authentication > Settings > Authorized domains.');
+          } else if (error.code === 'auth/popup-blocked') {
+            alert('⚠️ Popup blocked by browser! Please allow popups for this site to sign in with Google.');
+          } else {
+            alert('Google authentication error (' + error.code + '):\n' + error.message);
           }
         });
     });
