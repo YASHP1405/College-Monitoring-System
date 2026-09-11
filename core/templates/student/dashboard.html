@@ -5,6 +5,7 @@
 
 {% block body %}
 <div class="app-wrapper">
+
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
@@ -12,12 +13,15 @@
       <div class="brand-name">EduMonitor</div>
       <div class="brand-sub">Student Portal</div>
     </div>
+
     <nav class="sidebar-nav">
       <div class="nav-section-label">Navigation</div>
+
       <a href="{% url 'student_dashboard' %}" class="nav-item active">
         <span class="nav-icon">📊</span> Dashboard
       </a>
     </nav>
+
     <div class="sidebar-footer">
       <a href="{% url 'logout' %}" class="nav-item" style="color:var(--danger);">
         <span class="nav-icon">🚪</span> Logout
@@ -25,87 +29,546 @@
     </div>
   </aside>
 
-  <main class="main-content">
-    <button class="btn btn-ghost btn-sm" id="sidebarToggle" style="display:none; margin-bottom:16px;">☰ Menu</button>
 
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <button
+      class="btn btn-ghost btn-sm"
+      id="sidebarToggle"
+      style="display:none; margin-bottom:16px;">
+      ☰ Menu
+    </button>
+
+
+    <!-- Page Header -->
     <div class="page-header">
       <h1>🎓 Student Dashboard</h1>
-      <p>{{ current_day }} · {{ current_time }} <span class="live-dot" style="margin-left:8px;"></span></p>
+
+      <p>
+        {{ current_day }} · {{ current_time }}
+        <span class="live-dot" style="margin-left:8px;"></span>
+      </p>
     </div>
+
+
+    <!-- Live Search Box -->
+    <div class="search-container">
+
+      <input
+        type="text"
+        id="teacherSearch"
+        placeholder="🔍 Search by teacher name, subject, or room..."
+        aria-label="Search teachers"
+      >
+
+    </div>
+
 
     <!-- Teacher Status Cards -->
-    <div class="stats-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+    <div
+      class="stats-grid"
+      id="teacherGrid"
+      style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));"
+    >
+
       {% for code, teacher in teachers.items %}
-      <div class="card" style="position:relative; overflow:hidden;">
-        <!-- Top accent bar -->
+
+      <div
+        class="card teacher-card"
+        data-name="{{ teacher.name|default:''|lower }}"
+        data-subject="{{ teacher.current_lecture.subject|default:''|lower }}"
+        data-room="{{ teacher.current_lecture.room|default:''|lower }}"
+        style="position:relative; overflow:hidden;"
+      >
+
+
+        <!-- Top Accent Bar -->
+
         {% if teacher.current_lecture %}
-          <div style="position:absolute; top:0; left:0; width:100%; height:3px; background: linear-gradient(90deg, var(--primary), var(--accent));"></div>
+
+        <div
+          style="
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:3px;
+            background:linear-gradient(
+              90deg,
+              var(--primary),
+              var(--accent)
+            );
+          "
+        ></div>
+
+
         {% elif "ON LEAVE" in teacher.status|upper %}
-          <div style="position:absolute; top:0; left:0; width:100%; height:3px; background: linear-gradient(90deg, #ffd166, #e5a800);"></div>
+
+        <div
+          style="
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:3px;
+            background:linear-gradient(
+              90deg,
+              #ffd166,
+              #e5a800
+            );
+          "
+        ></div>
+
+
         {% elif "AVAILABLE" in teacher.status|upper %}
-          <div style="position:absolute; top:0; left:0; width:100%; height:3px; background: linear-gradient(90deg, #00e5a0, #00b37e);"></div>
+
+        <div
+          style="
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:3px;
+            background:linear-gradient(
+              90deg,
+              #00e5a0,
+              #00b37e
+            );
+          "
+        ></div>
+
+
         {% elif "NOT AVAILABLE" in teacher.status|upper %}
-          <div style="position:absolute; top:0; left:0; width:100%; height:3px; background: linear-gradient(90deg, #ff4d6d, #c9184a);"></div>
+
+        <div
+          style="
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:3px;
+            background:linear-gradient(
+              90deg,
+              #ff4d6d,
+              #c9184a
+            );
+          "
+        ></div>
+
+
         {% else %}
-          <div style="position:absolute; top:0; left:0; width:100%; height:3px; background: linear-gradient(90deg, var(--info), #0077b6);"></div>
+
+        <div
+          style="
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:3px;
+            background:linear-gradient(
+              90deg,
+              var(--info),
+              #0077b6
+            );
+          "
+        ></div>
+
         {% endif %}
 
-        <div class="flex items-center gap-3 mb-4" style="padding-top:8px;">
-          <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg, var(--bg-card-hover), rgba(108,99,255,0.15)); display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;">
+
+        <!-- Teacher Information -->
+
+        <div
+          class="flex items-center gap-3 mb-4"
+          style="padding-top:8px;"
+        >
+
+          <div
+            style="
+              width:48px;
+              height:48px;
+              border-radius:50%;
+              background:linear-gradient(
+                135deg,
+                var(--bg-card-hover),
+                rgba(108,99,255,0.15)
+              );
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:1.4rem;
+              flex-shrink:0;
+            "
+          >
             👨‍🏫
           </div>
+
+
           <div style="flex:1; min-width:0;">
-            <div style="font-weight:600; font-size:1.05rem;">{{ teacher.name }}</div>
-            <div class="text-xs text-muted">Code: {{ code }}</div>
+
+            <div
+              style="
+                font-weight:600;
+                font-size:1.05rem;
+              "
+            >
+              {{ teacher.name }}
+            </div>
+
+            <div class="text-xs text-muted">
+              Code: {{ code }}
+            </div>
+
           </div>
+
         </div>
 
-        <!-- Current Lecture Info -->
+
+        <!-- Current Lecture Information -->
+
         {% if teacher.current_lecture %}
-        <div style="background:rgba(108,99,255,0.1); border:1px solid rgba(108,99,255,0.25); border-radius:var(--radius-sm); padding:12px; margin-bottom:12px;">
+
+        <div
+          style="
+            background:rgba(108,99,255,0.1);
+            border:1px solid rgba(108,99,255,0.25);
+            border-radius:var(--radius-sm);
+            padding:12px;
+            margin-bottom:12px;
+          "
+        >
+
           <div class="flex items-center gap-2 mb-1">
+
             <span class="live-dot"></span>
-            <span class="text-sm font-bold" style="color:var(--primary-light);">Currently in Lecture</span>
+
+            <span
+              class="text-sm font-bold"
+              style="color:var(--primary-light);"
+            >
+              Currently in Lecture
+            </span>
+
           </div>
-          <div class="text-sm" style="color:var(--text-secondary);">
-            📍 Room: <strong>{{ teacher.current_lecture.room }}</strong>
+
+
+          <div
+            class="text-sm"
+            style="color:var(--text-secondary);"
+          >
+
+            📍 Room:
+            <strong>
+              {{ teacher.current_lecture.room }}
+            </strong>
+
+
             {% if teacher.current_lecture.subject %}
-              · 📚 {{ teacher.current_lecture.subject }}
+
+            · 📚
+            {{ teacher.current_lecture.subject }}
+
             {% endif %}
+
           </div>
+
         </div>
+
         {% endif %}
 
+
         <!-- Status Badge -->
+
         <div>
+
           {% if teacher.current_lecture %}
-            <span class="badge badge-lecture">📚 In Lecture</span>
+
+          <span class="badge badge-lecture">
+            📚 In Lecture
+          </span>
+
+
           {% elif "ON LEAVE" in teacher.status|upper %}
-            <span class="badge badge-leave">🏖️ {{ teacher.status }}</span>
+
+          <span class="badge badge-leave">
+            🏖️ {{ teacher.status }}
+          </span>
+
+
           {% elif "AVAILABLE" in teacher.status|upper %}
-            <span class="badge badge-available">🟢 {{ teacher.status }}</span>
+
+          <span class="badge badge-available">
+            🟢 {{ teacher.status }}
+          </span>
+
+
           {% elif "NOT AVAILABLE" in teacher.status|upper %}
-            <span class="badge badge-busy">🔴 Not Available</span>
+
+          <span class="badge badge-busy">
+            🔴 Not Available
+          </span>
+
+
           {% else %}
-            <span class="badge badge-info">{{ teacher.status|default:"No status" }}</span>
+
+          <span class="badge badge-info">
+            {{ teacher.status|default:"No status" }}
+          </span>
+
           {% endif %}
+
         </div>
+
+
+        <!-- Last Updated -->
 
         <div class="text-xs text-muted mt-2">
-          Updated: {{ teacher.last_updated|default:"Never" }}
+
+          Updated:
+
+          {{ teacher.last_updated|default:"Never" }}
+
         </div>
+
+
       </div>
+
       {% empty %}
-      <div class="card text-center text-muted" style="padding:60px 20px; grid-column: 1/-1;">
-        <div style="font-size:3rem; margin-bottom:12px;">👨‍🏫</div>
+
+      <div
+        class="card text-center text-muted"
+        style="
+          padding:60px 20px;
+          grid-column:1/-1;
+        "
+      >
+
+        <div
+          style="
+            font-size:3rem;
+            margin-bottom:12px;
+          "
+        >
+          👨‍🏫
+        </div>
+
         No teachers available to display.
+
       </div>
+
       {% endfor %}
+
+
+      <!-- No Search Results -->
+
+      <div
+        id="noResults"
+        class="card text-center text-muted"
+        style="
+          display:none;
+          padding:40px 20px;
+          grid-column:1/-1;
+        "
+      >
+
+        <div
+          style="
+            font-size:2.5rem;
+            margin-bottom:10px;
+          "
+        >
+          🔍
+        </div>
+
+        <h3>No teachers found</h3>
+
+        <p>
+          Try searching by teacher name, subject, or room.
+        </p>
+
+      </div>
+
     </div>
+
   </main>
+
 </div>
 
+
+<!-- Styling -->
+
 <style>
-  @media (max-width: 768px) { #sidebarToggle { display: inline-flex !important; } }
+
+  /* Mobile Sidebar */
+
+  @media (max-width:768px) {
+
+    #sidebarToggle {
+
+      display:inline-flex !important;
+
+    }
+
+  }
+
+
+  /* Search Container */
+
+  .search-container {
+
+    margin-bottom:24px;
+
+  }
+
+
+  /* Search Input */
+
+  #teacherSearch {
+
+    width:100%;
+
+    padding:14px 18px;
+
+    border-radius:10px;
+
+    border:1px solid var(--border);
+
+    background:var(--bg-card);
+
+    color:var(--text-primary);
+
+    font-size:1rem;
+
+    outline:none;
+
+    transition:0.2s;
+
+  }
+
+
+  /* Search Focus */
+
+  #teacherSearch:focus {
+
+    border-color:var(--primary);
+
+    box-shadow:
+      0 0 0 3px
+      rgba(108,99,255,0.15);
+
+  }
+
+
+  /* Placeholder */
+
+  #teacherSearch::placeholder {
+
+    color:var(--text-muted);
+
+  }
+
 </style>
+
+
+<!-- Live Search JavaScript -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const searchInput =
+    document.getElementById("teacherSearch");
+
+  const teacherCards =
+    document.querySelectorAll(".teacher-card");
+
+  const noResults =
+    document.getElementById("noResults");
+
+
+  searchInput.addEventListener(
+    "input",
+    function () {
+
+      const searchValue =
+        this.value
+          .toLowerCase()
+          .trim();
+
+
+      let visibleCards = 0;
+
+
+      teacherCards.forEach(
+        function (card) {
+
+
+          const name =
+            card.dataset.name || "";
+
+
+          const subject =
+            card.dataset.subject || "";
+
+
+          const room =
+            card.dataset.room || "";
+
+
+          const isMatch =
+
+            name.includes(searchValue) ||
+
+            subject.includes(searchValue) ||
+
+            room.includes(searchValue);
+
+
+          if (isMatch) {
+
+            card.style.display = "";
+
+            visibleCards++;
+
+          }
+
+          else {
+
+            card.style.display = "none";
+
+          }
+
+
+        }
+      );
+
+
+      /* Show No Results Message */
+
+      if (
+        visibleCards === 0 &&
+        searchValue !== ""
+      ) {
+
+        noResults.style.display = "block";
+
+      }
+
+      else {
+
+        noResults.style.display = "none";
+
+      }
+
+
+    }
+  );
+
+
+});
+
+</script>
+
+
 {% endblock %}
