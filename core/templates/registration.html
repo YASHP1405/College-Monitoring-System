@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create an Account | Student Portal</title>
+    <style>
+        :root {
+            --navy-blue: #1c2541;
+            --navy-dark: #111827;
+            --accent-gold: #c5a059;
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #cbd5e1;
+            --error-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            padding: 24px 16px;
+        }
+
+        .portrait-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 440px; 
+            padding: 36px 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--navy-blue);
+            margin-bottom: 12px;
+        }
+
+        .badge-icon {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-gold);
+            border-radius: 50%;
+        }
+
+        .card-header h2 {
+            color: var(--navy-blue);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .card-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .signup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease-in-out;
+            background-color: #fff;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--navy-blue);
+            box-shadow: 0 0 0 3px rgba(28, 37, 65, 0.15);
+        }
+
+        .error-msg {
+            color: var(--error-color);
+            font-size: 0.75rem;
+            display: none;
+        }
+
+        .form-group.invalid input,
+        .form-group.invalid select {
+            border-color: var(--error-color);
+        }
+
+        .form-group.invalid .error-msg {
+            display: block;
+        }
+
+        .form-terms {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .form-terms a {
+            color: var(--navy-blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .form-terms a:hover {
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--navy-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--navy-dark);
+        }
+
+        .card-footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .card-footer a {
+            color: var(--navy-blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .card-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portrait-card">
+        <div class="card-header">
+            <div class="brand-badge">
+                <span class="badge-icon"></span>
+                <span>GCOE</span>
+            </div>
+            <h2>Create Account</h2>
+            <p>Fill in your details to register for the portal</p>
+        </div>
+
+        <form id="signupForm" class="signup-form" novalidate>
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" placeholder="e.g. Jane Doe" required>
+                <small class="error-msg">Please enter your full name</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="name@cumminscollege.in" required>
+                <small class="error-msg">Please enter a valid email address</small>
+            </div>
+
+            <div class="form-group">
+                <label for="role">User Role</label>
+                <select id="role" name="role" required>
+                    <option value="" disabled selected>Select your role</option>
+                    <option value="student">Student</option>
+                    <option value="faculty">Faculty / Staff</option>
+                    <option value="alumni">Alumni</option>
+                </select>
+                <small class="error-msg">Please select a role</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Minimum 8 characters" required>
+                <small class="error-msg">Password must be at least 8 characters</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
+                <small class="error-msg">Passwords do not match</small>
+            </div>
+
+            <div class="form-terms">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+            </div>
+
+            <button type="submit" class="submit-btn">Register Account</button>
+        </form>
+
+        <div class="card-footer">
+            <p>Already registered? <a href="login.html">Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('signupForm');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                let isValid = true;
+
+                const fullname = document.getElementById('fullname');
+                const email = document.getElementById('email');
+                const role = document.getElementById('role');
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('confirmPassword');
+
+                if (fullname.value.trim() === '') {
+                    setError(fullname);
+                    isValid = false;
+                } else {
+                    removeError(fullname);
+                }
+
+                if (!validateEmail(email.value)) {
+                    setError(email);
+                    isValid = false;
+                } else {
+                    removeError(email);
+                }
+
+                if (role.value === '') {
+                    setError(role);
+                    isValid = false;
+                } else {
+                    removeError(role);
+                }
+
+                if (password.value.length < 8) {
+                    setError(password);
+                    isValid = false;
+                } else {
+                    removeError(password);
+                }
+
+                if (confirmPassword.value === '' || confirmPassword.value !== password.value) {
+                    setError(confirmPassword);
+                    isValid = false;
+                } else {
+                    removeError(confirmPassword);
+                }
+
+                if (isValid) {
+                    alert('Account created successfully!');
+                }
+            });
+
+            function setError(inputElement) {
+                const group = inputElement.parentElement;
+                group.classList.add('invalid');
+            }
+
+            function removeError(inputElement) {
+                const group = inputElement.parentElement;
+                group.classList.remove('invalid');
+            }
+
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(String(email).toLowerCase());
+            }
+        });
+    </script>
+</body>
+</html>
