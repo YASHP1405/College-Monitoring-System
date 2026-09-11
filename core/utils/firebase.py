@@ -183,15 +183,18 @@ def get_firebase():
     if _firebase_app is not None and db is not None:
         return _firebase_app, db
 
-    db_url = os.environ.get("FIREBASE_DATABASE_URL", "").strip()
+    def clean_val(key):
+        return os.environ.get(key, "").strip().strip('"').strip("'").strip()
+
+    db_url = clean_val("FIREBASE_DATABASE_URL")
     if db_url and (db_url.startswith("http://") or db_url.startswith("https://")):
         try:
             import pyrebase
             config = {
-                "apiKey": os.environ.get("FIREBASE_API_KEY", ""),
-                "authDomain": os.environ.get("FIREBASE_AUTH_DOMAIN", ""),
+                "apiKey": clean_val("FIREBASE_API_KEY"),
+                "authDomain": clean_val("FIREBASE_AUTH_DOMAIN"),
                 "databaseURL": db_url,
-                "storageBucket": os.environ.get("FIREBASE_STORAGE_BUCKET", ""),
+                "storageBucket": clean_val("FIREBASE_STORAGE_BUCKET"),
             }
             _firebase_app = pyrebase.initialize_app(config)
             db = _firebase_app.database()

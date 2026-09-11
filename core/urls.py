@@ -4,6 +4,8 @@ from core.views import auth_views, admin_views, teacher_views, lab_views, studen
 urlpatterns = [
     # ── Auth ──────────────────────────────────────────────────────────────────
     path("", auth_views.login_view, name="login"),
+    path("signup/", auth_views.signup_view, name="signup"),
+    path("google-login/", auth_views.google_login_view, name="google_login"),
     path("logout/", auth_views.logout_view, name="logout"),
     path("forgot-password/", auth_views.forgot_password_view, name="forgot_password"),
 

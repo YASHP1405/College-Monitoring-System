@@ -644,6 +644,64 @@ tbody td:first-child { color: var(--text-primary); font-weight: 500; }
   margin: 20px 0;
 }
 
+.auth-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.auth-separator:not(:empty)::before {
+  margin-right: 12px;
+}
+
+.auth-separator:not(:empty)::after {
+  margin-left: 12px;
+}
+
+/* ─── Google Button ────────────────────────────────────────────────── */
+.btn-google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+}
+
+.btn-google:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-google svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 /* ─── Pulse / Live Dot ────────────────────────────────────────────── */
 .live-dot {
   display: inline-block;
