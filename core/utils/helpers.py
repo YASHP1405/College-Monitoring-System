@@ -102,13 +102,13 @@ def calculate_status(teacher: dict) -> tuple[str, str, str]:
 
 def setup_defaults():
     """
-    Ensure a default super admin exists in Firebase.
+    Ensure a default super admin and student exist in Firebase.
     Called once when Django starts (via AppConfig.ready).
     """
     import os
-    db_url = os.environ.get("FIREBASE_DATABASE_URL", "").strip()
+    db_url = os.environ.get("FIREBASE_DATABASE_URL", "").strip().strip('"').strip("'").strip()
     if not db_url:
-        logger.info("ℹ️ FIREBASE_DATABASE_URL not configured in .env. Skipping default admin seeding.")
+        logger.info("ℹ️ FIREBASE_DATABASE_URL not configured in .env. Skipping default data seeding.")
         return
 
     from core.utils.firebase import db
@@ -116,14 +116,23 @@ def setup_defaults():
         logger.warning("Firebase not available, skipping setup_defaults.")
         return
     try:
-        existing = db.child("admins").child("admin1").get().val()
-        if not existing:
+        # Seed default admin if missing
+        admin_existing = db.child("admins").child("admin1").get().val()
+        if not admin_existing:
             db.child("admins").child("admin1").set({
                 "name": "Super Admin",
                 "password": hash_password("admin123")
             })
-            logger.info("✅ Default admin created!")
-        else:
-            logger.info("ℹ️ Admin already exists, skipping setup.")
+            logger.info("✅ Default admin (admin1) created!")
+
+        # Seed default student if missing
+        student_existing = db.child("students").child("student1").get().val()
+        if not student_existing:
+            db.child("students").child("student1").set({
+                "name": "Demo Student",
+                "email": "student1@college.edu",
+                "password": hash_password("student123!")
+            })
+            logger.info("✅ Default student (student1) created!")
     except Exception as e:
         logger.warning("setup_defaults skipped: %s", e)

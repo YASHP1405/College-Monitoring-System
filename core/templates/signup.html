@@ -1,59 +1,75 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Login{% endblock %}
-{% block meta_description %}Login to the College Monitoring System — Admin, Teacher, Lab, or Student portal.{% endblock %}
+{% block title %}Student Signup{% endblock %}
+{% block meta_description %}Register for a Student Account on EduMonitor — College Monitoring System.{% endblock %}
 
 {% block body %}
 <div class="auth-wrapper">
-  <div class="auth-card">
+  <div class="auth-card" style="max-width: 480px;">
     <div class="auth-logo">
       <div class="logo-icon">🎓</div>
-      <h1>EduMonitor</h1>
-      <p>College Monitoring System</p>
+      <h1>Student Signup</h1>
+      <p>Create your student monitoring account</p>
     </div>
 
-    <!-- Google Sign In -->
-    <button type="button" class="btn-google mb-2" id="googleSignInBtn">
+    <!-- Google Sign Up -->
+    <button type="button" class="btn-google mb-2" id="googleSignUpBtn">
       <svg viewBox="0 0 24 24">
         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
         <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
         <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.5s.7 4.8 1.9 7.2l3.7-2.9z"/>
         <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.4 7.5 23.5 12 23.5z"/>
       </svg>
-      Sign in with Google
+      Sign up with Google
     </button>
 
-    <div class="auth-separator">or sign in with ID / Email</div>
+    <div class="auth-separator">or register with email</div>
 
-    <form method="POST" action="{% url 'login' %}" autocomplete="off">
+    <form method="POST" action="{% url 'signup' %}" autocomplete="off">
       {% csrf_token %}
-      <div class="form-group">
-        <label class="form-label" for="user_id">User ID or Email</label>
-        <input type="text" id="user_id" name="user_id" class="form-control" placeholder="Enter ID or email address" required autofocus />
-      </div>
 
       <div class="form-group">
-        <label class="form-label" for="password">Password</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required />
+        <label class="form-label" for="name">Full Name</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Jane Doe" required autofocus />
       </div>
 
-      <button type="submit" class="btn btn-primary btn-lg w-full mt-2" id="loginBtn">
-        🔐 Sign In
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="user_id">Student ID / Roll No</label>
+          <input type="text" id="user_id" name="user_id" class="form-control" placeholder="e.g. STU202501" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="you@college.edu" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Min. letters, digits, symbols" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirm_password">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-enter password" required />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg w-full mt-2" id="signupBtn">
+        ✨ Create Account
       </button>
     </form>
 
     <div class="divider"></div>
 
-    <div class="text-center" style="display: flex; flex-direction: column; gap: 8px;">
-      <a href="{% url 'forgot_password' %}" class="text-sm text-secondary" style="transition: var(--transition);">
-        Forgot Password? <span style="color: var(--accent);">Reset here</span>
-      </a>
-
+    <div class="text-center">
       <p class="text-sm text-secondary">
-        Are you a student?
-        <a href="{% url 'signup' %}" style="color: var(--accent); font-weight: 600; transition: var(--transition);">
-          Create an Account
+        Already have an account?
+        <a href="{% url 'login' %}" style="color: var(--accent); font-weight: 600; transition: var(--transition);">
+          Sign In here
         </a>
       </p>
     </div>
@@ -80,13 +96,13 @@ if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your-firebase-api-key') 
     firebase.initializeApp(firebaseConfig);
   }
 
-  const googleBtn = document.getElementById('googleSignInBtn');
+  const googleBtn = document.getElementById('googleSignUpBtn');
   if (googleBtn) {
     googleBtn.addEventListener('click', function() {
       const btn = this;
       const originalText = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = '<span style="opacity:0.8;">Connecting to Google...</span>';
+      btn.innerHTML = '<span style="opacity:0.8;">Signing in with Google...</span>';
 
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.addScope('email');
@@ -115,7 +131,7 @@ if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your-firebase-api-key') 
           if (data.success) {
             window.location.href = data.redirect_url;
           } else {
-            alert('Google Sign-In failed: ' + (data.error || 'Unknown error'));
+            alert('Google Sign-Up failed: ' + (data.error || 'Unknown error'));
             btn.disabled = false;
             btn.innerHTML = originalText;
           }
@@ -130,7 +146,7 @@ if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your-firebase-api-key') 
     });
   }
 } else {
-  document.getElementById('googleSignInBtn')?.addEventListener('click', function() {
+  document.getElementById('googleSignUpBtn')?.addEventListener('click', function() {
     alert('Firebase is not yet configured in .env. Please check FIREBASE_API_KEY.');
   });
 }
