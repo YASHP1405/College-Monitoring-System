@@ -13,59 +13,146 @@
       <p>College Monitoring System</p>
     </div>
 
+    <!-- Google Sign In -->
+    <button type="button" class="btn-google mb-2" id="googleSignInBtn">
+      <svg viewBox="0 0 24 24">
+        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.5s.7 4.8 1.9 7.2l3.7-2.9z"/>
+        <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.4 7.5 23.5 12 23.5z"/>
+      </svg>
+      Sign in with Google
+    </button>
+
+    <div class="auth-separator">or sign in with ID / Email</div>
+
     <form method="POST" action="{% url 'login' %}" autocomplete="off">
       {% csrf_token %}
       <div class="form-group">
-        <label class="form-label" for="user_id">User ID / Short Code</label>
-        <input type="text" id="user_id" name="user_id" class="form-control" placeholder="Enter your ID" required autofocus />
+        <label class="form-label" for="user_id">User ID or Email</label>
+        <input type="text" id="user_id" name="user_id" class="form-control" placeholder="Enter ID or email address" required autofocus />
       </div>
 
-            <div class="form-group">
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required />
+      </div>
 
-                <label for="password">Password</label>
+      <div class="form-options">
+        <div class="remember-me">
+          <input type="checkbox" id="remember" name="remember" />
+          <label for="remember">Remember me</label>
+        </div>
+        <a href="{% url 'forgot_password' %}" class="forgot-password">
+          Forgot Password?
+        </a>
+      </div>
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    required
-                >
-
-                <small class="error-msg">
-                    Password cannot be empty
-                </small>
-
-            </div>
-
-
-            <div class="form-options">
-
-                <div class="remember-me">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Remember me</label>
-                </div>
-
-                <a href="#" class="forgot-password">
-                    Forgot Password?
-                </a>
-
-            </div>
-
-
-            <button type="submit" class="submit-btn">
-                Sign In
-            </button>
-
-        </form>
+      <button type="submit" class="btn btn-primary btn-lg w-full mt-2" id="loginBtn">
+        🔐 Sign In
+      </button>
+    </form>
 
     <div class="divider"></div>
 
-    <div class="text-center">
-      <a href="{% url 'forgot_password' %}" class="text-sm text-secondary" style="transition: var(--transition);">
-        Forgot Password? <span style="color: var(--accent);">Reset here</span>
-      </a>
+    <div class="text-center" style="display: flex; flex-direction: column; gap: 8px;">
+      <p class="text-sm text-secondary">
+        Are you a student?
+        <a href="{% url 'signup' %}" style="color: var(--accent); font-weight: 600; transition: var(--transition);">
+          Create an Account
+        </a>
+      </p>
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock body %}
+
+{% block extra_scripts %}
+<!-- Firebase App & Auth SDK (Compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "{{ FIREBASE_CLIENT_CONFIG.apiKey }}",
+  authDomain: "{{ FIREBASE_CLIENT_CONFIG.authDomain }}",
+  databaseURL: "{{ FIREBASE_CLIENT_CONFIG.databaseURL }}",
+  projectId: "{{ FIREBASE_CLIENT_CONFIG.projectId }}",
+  storageBucket: "{{ FIREBASE_CLIENT_CONFIG.storageBucket }}"
+};
+
+if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your-firebase-api-key') {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  // Handle redirect result when returning from Google
+  firebase.auth().getRedirectResult()
+    .then((result) => {
+      if (result && result.user) {
+        const user = result.user;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,15,25,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:white;font-family:sans-serif;backdrop-filter:blur(10px);';
+        overlay.innerHTML = '<div style="font-size:2.2rem;margin-bottom:12px;">🎓</div><div style="font-size:1.1rem;font-weight:600;">Signing in with Google...</div>';
+        document.body.appendChild(overlay);
+
+        fetch('{% url "google_login" %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({
+            email: user.email,
+            displayName: user.displayName,
+            uid: user.uid
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = data.redirect_url;
+          } else {
+            alert('Google login failed: ' + (data.error || 'Unknown error'));
+            overlay.remove();
+          }
+        })
+        .catch(err => {
+          alert('Network error connecting to server.');
+          overlay.remove();
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Firebase Redirect Result Error:", error);
+      if (error.code === 'auth/operation-not-allowed' || error.code === 'auth/configuration-not-found') {
+        alert('⚠️ Google Sign-In is not enabled yet in your Firebase Console!\n\nTo fix:\n1. Go to Firebase Console > Authentication > Sign-in method\n2. Click "Google"\n3. Toggle "Enable"\n4. Select your support email and click "Save".');
+      } else if (error.code === 'auth/unauthorized-domain') {
+        alert('⚠️ Domain not authorized in Firebase!\n\nTo fix:\n1. Open http://localhost:8000/ instead of 127.0.0.1\nOR\n2. Add 127.0.0.1 in Firebase Console > Authentication > Settings > Authorized domains.');
+      } else {
+        alert('Google authentication error (' + error.code + '):\n' + error.message);
+      }
+    });
+
+  const googleBtn = document.getElementById('googleSignInBtn');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', function() {
+      const btn = this;
+      btn.disabled = true;
+      btn.innerHTML = '<span style="opacity:0.8;">Redirecting to Google...</span>';
+
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.addScope('email');
+      provider.addScope('profile');
+
+      firebase.auth().signInWithRedirect(provider);
+    });
+  }
+} else {
+  document.getElementById('googleSignInBtn')?.addEventListener('click', function() {
+    alert('Firebase is not yet configured in .env. Please check FIREBASE_API_KEY.');
+  });
+}
+</script>
+{% endblock extra_scripts %}

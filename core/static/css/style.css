@@ -637,6 +637,43 @@ tbody td:first-child { color: var(--text-primary); font-weight: 500; }
 .grid-3      { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .grid-4      { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 
+/* ─── Form Options (Remember me & Forgot Password) ─────────────────── */
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-me input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.forgot-password {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.forgot-password:hover {
+  color: var(--accent);
+}
+
 /* ─── Divider ─────────────────────────────────────────────────────── */
 .divider {
   height: 1px;
