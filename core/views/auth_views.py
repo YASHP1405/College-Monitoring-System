@@ -260,6 +260,12 @@ def forgot_password_view(request):
     return render(request, "forgot_password.html")
 
 
+def registration_view(request):
+    """Render the responsive registration page added by Aadya."""
+    return render(request, "registration.html")
+
+
+
 # ─── Internal Helper ──────────────────────────────────────────────────────────
 
 def _redirect_by_role(role: str):

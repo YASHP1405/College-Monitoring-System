@@ -5,6 +5,7 @@ urlpatterns = [
     # ── Auth ──────────────────────────────────────────────────────────────────
     path("", auth_views.login_view, name="login"),
     path("signup/", auth_views.signup_view, name="signup"),
+    path("registration/", auth_views.registration_view, name="registration"),
     path("google-login/", auth_views.google_login_view, name="google_login"),
     path("logout/", auth_views.logout_view, name="logout"),
     path("forgot-password/", auth_views.forgot_password_view, name="forgot_password"),
