@@ -115,68 +115,89 @@ def login_view(request):
 
 
 def signup_view(request):
-    """Handle Student self-registration."""
+    """Handle Student self-registration using Aadya's registration template."""
     if request.session.get("role"):
         return _redirect_by_role(request.session["role"])
 
     if request.method == "POST":
-        name = request.POST.get("name", "").strip()
+        name = (request.POST.get("fullname") or request.POST.get("name") or "").strip()
         user_id = request.POST.get("user_id", "").strip().lower()
         email = request.POST.get("email", "").strip().lower()
+        role = request.POST.get("role", "student").strip().lower()
         password = request.POST.get("password", "")
-        confirm_password = request.POST.get("confirm_password", "")
+        confirm_password = (request.POST.get("confirm_password") or request.POST.get("confirmPassword") or "").strip()
 
-        if not name or not user_id or not password:
-            messages.error(request, "❌ Full Name, Student ID, and Password are required!")
-            return render(request, "signup.html")
+        # If user_id is empty, generate from email or name
+        if not user_id and email:
+            user_id = re.sub(r'[^a-zA-Z0-9_.-]', '', email.split("@")[0]).lower()
+        elif not user_id and name:
+            user_id = re.sub(r'[^a-zA-Z0-9_.-]', '', name.lower().replace(" ", "."))
+
+        context = {"fullname": name, "name": name, "user_id": user_id, "email": email, "role": role}
+
+        if not name or not password:
+            messages.error(request, "❌ Full Name and Password are required!")
+            return render(request, "registration.html", context)
+
+        if not user_id:
+            messages.error(request, "❌ Please provide a Student ID or Email.")
+            return render(request, "registration.html", context)
 
         if not re.match(r'^[a-zA-Z0-9_.-]+$', user_id):
-            messages.error(request, "❌ Student ID can only contain letters, numbers, dots, and underscores.")
-            return render(request, "signup.html")
+            messages.error(request, "❌ User ID can only contain letters, numbers, dots, and underscores.")
+            return render(request, "registration.html", context)
 
         if password != confirm_password:
             messages.error(request, "❌ Passwords do not match!")
-            return render(request, "signup.html")
+            return render(request, "registration.html", context)
 
-        if not validate_password(password):
-            messages.error(request, "❌ Password must contain letters, numbers, and symbols.")
-            return render(request, "signup.html")
+        if len(password) < 6:
+            messages.error(request, "❌ Password must be at least 6 characters.")
+            return render(request, "registration.html", context)
 
         try:
-            # Check if student ID exists
-            existing_student = db.child("students").child(user_id).get().val()
-            if existing_student:
-                messages.error(request, f"❌ Student ID '{user_id}' is already registered!")
-                return render(request, "signup.html")
+            target_collection = "teachers" if role in ["faculty", "teacher"] else "students"
+            role_assigned = "teacher" if role in ["faculty", "teacher"] else "student"
 
-            # Check if email is registered
+            # Check if user ID already exists
+            existing_user = db.child(target_collection).child(user_id).get().val()
+            if existing_user:
+                messages.error(request, f"❌ ID '{user_id}' is already registered!")
+                return render(request, "registration.html", context)
+
+            # Check if email is already registered
             if email:
-                all_students = db.child("students").get().val() or {}
-                for sid, sdata in all_students.items():
-                    if isinstance(sdata, dict) and sdata.get("email", "").lower() == email:
+                all_users = db.child(target_collection).get().val() or {}
+                for uid, udata in all_users.items():
+                    if isinstance(udata, dict) and udata.get("email", "").lower() == email:
                         messages.error(request, f"❌ Email '{email}' is already registered!")
-                        return render(request, "signup.html")
+                        return render(request, "registration.html", context)
 
-            # Register student in Firebase
-            db.child("students").child(user_id).set({
+            # Register user in database
+            db.child(target_collection).child(user_id).set({
                 "name": name,
                 "email": email,
+                "role": role_assigned,
                 "password": hash_password(password),
                 "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
 
             # Auto login
-            request.session["role"] = "student"
+            request.session["role"] = role_assigned
             request.session["user_id"] = user_id
             request.session["user_name"] = name
-            messages.success(request, f"🎉 Account created! Welcome, {name}!")
+            messages.success(request, f"🎉 Account created successfully! Welcome, {name}!")
+
+            if role_assigned == "teacher":
+                return redirect(reverse("teacher_dashboard"))
             return redirect(reverse("student_dashboard"))
 
         except Exception as e:
-            logger.exception("Signup error: %s", e)
+            logger.exception("Registration error: %s", e)
             messages.error(request, "❌ Registration failed. Please try again.")
+            return render(request, "registration.html", context)
 
-    return render(request, "signup.html")
+    return render(request, "registration.html")
 
 
 def google_login_view(request):
@@ -258,11 +279,6 @@ def forgot_password_view(request):
         return redirect(reverse("login"))
 
     return render(request, "forgot_password.html")
-
-
-def registration_view(request):
-    """Render the responsive registration page added by Aadya."""
-    return render(request, "registration.html")
 
 
 
