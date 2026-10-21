@@ -14,9 +14,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ─── Security ────────────────────────────────────────────────────────────────
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-change-me-in-production")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",") if h.strip()]
-if "testserver" not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append("testserver")
+ALLOWED_HOSTS = [h.strip().strip("'").strip('"') for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver,.pythonanywhere.com").split(",") if h.strip()]
+if "*" not in ALLOWED_HOSTS:
+    for default_host in [".pythonanywhere.com", "localhost", "127.0.0.1", "testserver"]:
+        if default_host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(default_host)
+
+# ─── CSRF Trusted Origins (Required for HTTPS / PythonAnywhere) ──────────────
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.pythonanywhere.com",
+    "http://127.0.0.1",
+    "http://localhost",
+]
+raw_origins = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
+if raw_origins:
+    CSRF_TRUSTED_ORIGINS.extend([o.strip().strip("'").strip('"') for o in raw_origins.split(",") if o.strip()])
 
 # ─── Applications ─────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
