@@ -1,128 +1,208 @@
-# 🎓 EduMonitor — College Monitoring System
+# 🎓 EduMonitor — College Monitoring & Management System
 
-A modern, full-featured College Monitoring System built with **Django 4.2 LTS** and powered by **Firebase Realtime Database**. Features real-time teacher tracking, lab equipment defect reporting, student schedule lookups, and complete institutional oversight through a sleek dark glassmorphism dashboard.
+<div align="center">
 
-Designed for seamless deployment to **GitHub** and **PythonAnywhere**.
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-4.2%20LTS-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Firebase](https://img.shields.io/badge/Firebase-Realtime%20Database-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)](#)
 
----
+<p align="center">
+  <b>A unified, real-time academic administration and monitoring platform.</b><br>
+  Track faculty lecture schedules, monitor computer lab hardware health, manage student directories, and streamline institutional communication through a responsive dark-mode glassmorphism interface.
+</p>
 
-## ✨ Features
+[Quick Start](#-quick-start-guide) •
+[Key Features](#-key-features) •
+[Default Credentials](#-default-credentials) •
+[System Architecture](#-system-architecture) •
+[Deployment](#-deployment-to-pythonanywhere)
 
-### 👨‍💼 1. Admin Portal
-- **Overview Dashboard**: High-level statistics on teachers, labs, students, active issues, and equipment counts.
-- **Teacher Management**: Register new faculty, generate short codes, assign credentials, and view or remove staff.
-- **Real-Time Teacher Status**: Live monitoring showing whether teachers are Available, Busy in Lecture (with room & subject), or On Leave.
-- **Lab Management**: Register computer labs, track system counts, view defect logs, and inspect detailed lab statistics via modal dialogs.
-- **Lab Reports History**: Detailed chronological defect logs categorized by month and date.
-
-### 👨‍🏫 2. Teacher Portal
-- **Status Dashboard**: Quickly update current availability (`AVAILABLE`, `NOT AVAILABLE`, `ON LEAVE`) with room and return date specifications.
-- **Live Lecture Detection**: Automatically detects ongoing lectures based on the current day and time slot.
-- **Schedule Management**: Full weekly timetable builder — add or remove lecture slots per day with room and subject details.
-
-### 🖥️ 3. Lab Technician Portal
-- **Equipment Defect Reporting**: Submit structured fault reports covering monitors, CPUs, mice, keyboards, switches, and custom issues.
-- **Historical Report Archive**: Browse past submissions organized by month and date.
-- **Live Report Deletion**: Remove resolved defect tickets asynchronously with instant UI feedback.
-
-### 🎓 4. Student Portal
-- **Faculty Directory**: Searchable list of teachers with real-time availability badges.
-- **Live Lecture Tracker**: View who is currently teaching, in which classroom, and which subject.
-- **Daily Timetable**: Check today's schedule for any faculty member.
+</div>
 
 ---
 
-## 🎨 UI / Design System
-- **Theme**: Premium Dark Glassmorphism (`backdrop-filter: blur(16px)`).
-- **Typography**: Google Fonts (*Outfit* headings & *Inter* body).
-- **Color Palette**: Violet / Indigo (`#6c63ff`), Cyan (`#00d4ff`), Emerald (`#00e5a0`), Coral (`#ff6b6b`).
-- **Responsiveness**: Fully responsive desktop sidebar and mobile slide-out navigation.
-- **Micro-Interactions**: Smooth card hover lifts, floating badges, auto-dismissing toast notifications.
+## 📌 Table of Contents
+
+- [Overview](#-overview)
+- [Key Features by Role](#-key-features-by-role)
+  - [1. Administrator Portal](#1--administrator-portal)
+  - [2. Faculty / Teacher Portal](#2--faculty--teacher-portal)
+  - [3. Lab Technician Portal](#3--lab-technician-portal)
+  - [4. Student Portal](#4--student-portal)
+  - [5. Authentication & Security](#5--authentication--security)
+- [Zero-Config Fallback Mode](#-zero-config-fallback-mode)
+- [System Architecture & Tech Stack](#-system-architecture--tech-stack)
+- [Project Directory Structure](#-project-directory-structure)
+- [Quick Start Guide (Local Setup)](#-quick-start-guide)
+- [Default Demo Credentials](#-default-credentials)
+- [Firebase Integration Guide (Optional)](#-firebase-integration-guide)
+- [Deployment to PythonAnywhere](#-deployment-to-pythonanywhere)
+- [Security & Pre-Push Checklist](#-security--github-pre-push-checklist)
+- [License](#-license)
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## 📖 Overview
 
-| Component | Technology |
-|---|---|
-| **Framework** | Django 4.2 LTS |
-| **Database** | Firebase Realtime Database (`pyrebase4`) |
-| **Frontend** | Semantic HTML5 + Custom Vanilla CSS (Design System) |
-| **Sessions** | Django Database-backed Sessions (`SQLite3`) |
-| **Authentication** | Role-based authentication (Admin, Teacher, Lab, Student) with SHA-256 password hashing |
-| **Deployment Target** | GitHub & PythonAnywhere |
+In modern academic campuses, coordination between administrators, faculty, lab technicians, and students often relies on scattered spreadsheets, paper logs, or fragmented apps.
+
+**EduMonitor** consolidates all campus operations into one centralized web application:
+- **Administrators** maintain institution-wide oversight of staff, lab workstations, and active issues.
+- **Teachers** update real-time availability and manage automated weekly timetables.
+- **Lab Technicians** log and track hardware defects (CPUs, monitors, peripherals, networking switches).
+- **Students** check real-time faculty availability and lecture rooms without roaming campus corridors.
 
 ---
 
-## 📂 Project Structure
+## 🌟 Key Features by Role
+
+### 1. 🛡️ Administrator Portal
+- **Executive Analytics**: Live metric cards displaying total registered faculty, operational labs, recorded hardware issues, and active students.
+- **Faculty Directory Management**: Register new faculty, generate random secure passwords, assign short codes (e.g. `T01`), or remove records.
+- **Live Faculty Radar**: Real-time status tracker indicating whether each teacher is **Available**, **In Lecture** (with room & subject), or **On Leave**.
+- **Lab Workstation Control**: Register labs, configure system counts, inspect defect breakdowns via interactive modals, or decommission obsolete labs.
+- **Chronological Defect History**: Inspect archived hardware fault reports grouped by month and date.
+
+### 2. 👨‍🏫 Faculty / Teacher Portal
+- **Instant Availability Toggle**: Set status to `AVAILABLE`, `NOT AVAILABLE`, or `ON LEAVE` (with return date and optional room notes).
+- **Intelligent Lecture Detection**: Automatically calculates and highlights ongoing lectures based on the current day of the week and system clock.
+- **Interactive Timetable Builder**: Configure weekly lecture schedules with precise time slots (e.g., `09:00-10:00`), assigned rooms, and course subjects.
+
+### 3. 🖥️ Lab Technician Portal
+- **Hardware Fault Ticketing**: Log structured reports for malfunctioning monitors, CPUs, mice, keyboards, switches, and custom defect descriptions.
+- **Historical Log Archive**: Browse past repair requests organized chronologically.
+- **Real-Time Ticket Closure**: Resolve and remove defects with instant asynchronous UI updates.
+
+### 4. 🎓 Student Portal
+- **Searchable Faculty Directory**: Search teachers by name or department code with real-time status badges.
+- **Live Classroom Tracker**: Immediately verify whether a professor is currently lecturing, including room number and subject.
+- **Daily Schedule Viewer**: Inspect any teacher's full schedule for the current day.
+
+### 5. 🔐 Authentication & Security
+- **Unified Multi-Role Login**: Clean single login screen supporting Admin, Teacher, Lab Technician, and Student access by **User ID** or **Email Address**.
+- **Student & Teacher Registration**: Dedicated signup flow with strict password complexity validation (letters, numbers, and symbols).
+- **Google OAuth Integration**: One-click Google sign-in via Firebase Client SDK.
+- **Session Persistence**: Optional "Remember Me" functionality.
+- **Password Reset**: Self-service reset option for faculty accounts.
+- **Secure Password Storage**: Cryptographically hashed using SHA-256 before storage.
+
+---
+
+## ⚡ Zero-Config Fallback Mode
+
+> [!TIP]
+> **No Firebase account? No problem!**  
+> EduMonitor includes an automatic local JSON database fallback (`firebase_local.json`).  
+> Anyone cloning this repository can run migrations and launch the app immediately for testing and evaluation **without creating a Firebase project or entering any API keys**.  
+> When you're ready for production or cloud sync, simply add your Firebase credentials to `.env`.
+
+---
+
+## 🏗️ System Architecture & Tech Stack
 
 ```text
-Monitoring System/
-├── .env                       # Local environment variables (do NOT commit)
-├── .env.example               # Template for environment variables
-├── .gitignore                 # Git ignore rules for Django & Python
-├── manage.py                  # Django CLI entrypoint
-├── requirements.txt           # Python dependencies
-├── README.md                  # Project documentation
-├── monitoring_system/         # Project configuration
+┌─────────────────────────────────────────────────────────────┐
+│                      Client Browser                         │
+│  (Modern Dark-Theme Glassmorphism UI, Vanilla CSS, JS)      │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ HTTP / JSON API
+┌──────────────────────────────▼──────────────────────────────┐
+│                    Django 4.2 LTS Core                      │
+│   • URL Routing & Context Processors                        │
+│   • Multi-Role Auth & Session Management (SQLite3)          │
+│   • Helper Utilities, Time-Slot Resolvers, Cryptography     │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+               ┌───────────────┴───────────────┐
+               ▼                               ▼
+  ┌─────────────────────────┐     ┌─────────────────────────┐
+  │ Firebase Realtime DB    │     │ Local JSON Database     │
+  │ (Cloud Sync via Pyrebase)│     │ (Zero-Config Fallback)  │
+  └─────────────────────────┘     └─────────────────────────┘
+```
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Backend Framework** | Django 4.2 LTS (Python) | Robust URL routing, sessions, views, and templating |
+| **Primary Database** | Firebase Realtime Database | Real-time multi-client state synchronization |
+| **Fallback Database** | Local JSON Store (`firebase_local.json`) | Seamless offline development and preview |
+| **Session Backend** | Django Sessions (`SQLite3`) | Isolated, secure server-side session management |
+| **Frontend Styling** | Semantic HTML5 & Vanilla CSS | Custom glassmorphism design system (`style.css`) |
+| **Icons & Typography** | Google Fonts (*Outfit* & *Inter*) + Font Awesome | Polished typography and modern iconography |
+| **Deployment Target** | PythonAnywhere / Gunicorn / Render | Production-ready WSGI configuration |
+
+---
+
+## 📂 Project Directory Structure
+
+```text
+College-Monitoring-System/
+├── .env.example               # Environment variables template (safe to commit)
+├── .gitignore                 # Excludes secrets, virtual environments, DBs, and caches
+├── LICENSE                    # MIT open-source license
+├── README.md                  # Comprehensive project documentation
+├── manage.py                  # Django administrative CLI
+├── requirements.txt           # Python package dependencies
+│
+├── monitoring_system/         # Project Settings & WSGI Configuration
 │   ├── __init__.py
 │   ├── asgi.py                # ASGI entrypoint
-│   ├── settings.py            # Django settings (Firebase config, sessions, static)
-│   ├── urls.py                # Root URL router
-│   └── wsgi.py                # WSGI entrypoint (for PythonAnywhere)
-└── core/                      # Main application
-    ├── apps.py                # App configuration & default admin bootstrap
-    ├── urls.py                # Route definitions
+│   ├── settings.py            # Core Django configuration & context processors
+│   ├── urls.py                # Root URL routing table
+│   └── wsgi.py                # WSGI entrypoint for production servers
+│
+└── core/                      # Application Logic & Templates
+    ├── apps.py                # App configuration & default admin bootstrapping
+    ├── urls.py                # Role-specific route definitions
+    ├── context_processors.py  # Supplies client-side Firebase config to templates
+    │
     ├── static/
     │   └── css/
-    │       └── style.css      # Glassmorphism design system (~480 lines)
-    ├── templates/
-    │   ├── base.html          # Base layout with toast alerts & sidebar logic
-    │   ├── login.html         # Unified multi-role login
-    │   ├── forgot_password.html # Teacher password reset
-    │   ├── admin/
-    │   │   ├── dashboard.html
-    │   │   ├── teacher_manage.html
-    │   │   ├── teacher_status.html
-    │   │   ├── lab_manage.html
-    │   │   └── lab_reports.html
-    │   ├── teacher/
-    │   │   ├── dashboard.html
-    │   │   └── schedule.html
-    │   ├── lab/
-    │   │   └── dashboard.html
-    │   └── student/
-    │       └── dashboard.html
+    │       └── style.css      # Dark glassmorphism design system
+    │
+    ├── templates/             # UI Templates
+    │   ├── base.html          # Shell layout with toast alerts & navigation
+    │   ├── login.html         # Unified multi-role login & Google Sign-In
+    │   ├── registration.html  # Responsive student/faculty signup
+    │   ├── forgot_password.html # Teacher password reset flow
+    │   ├── admin/             # Administrator dashboard & management views
+    │   ├── teacher/           # Faculty dashboard & timetable editor
+    │   ├── lab/               # Lab technician dashboard & defect logger
+    │   └── student/           # Student directory & real-time tracker
+    │
     ├── utils/
-    │   ├── __init__.py
-    │   ├── firebase.py        # Pyrebase initialization & db client
-    │   ├── helpers.py         # Passwords, time-slot calculations, bootstrapping
-    │   └── reports.py         # Report flattening, counting, & sanitization
+    │   ├── firebase.py        # Database connector with local fallback emulator
+    │   ├── helpers.py         # Password hashing & schedule time calculation
+    │   └── reports.py         # Report flattening & statistics sanitization
+    │
     └── views/
-        ├── __init__.py
-        ├── auth_views.py      # Login, logout, forgot password
-        ├── admin_views.py     # Admin dashboard, faculty & lab management
-        ├── teacher_views.py   # Teacher status & schedule management
-        ├── lab_views.py       # Lab report submission & management
-        └── student_views.py   # Student directory & real-time tracker
+        ├── auth_views.py      # Login, registration, Google callback, logout
+        ├── admin_views.py     # Admin operations (faculty & lab CRUD)
+        ├── teacher_views.py   # Availability updates & timetable edits
+        ├── lab_views.py       # Defect report submission & resolution
+        └── student_views.py   # Student search & timetable lookup
 ```
 
 ---
 
-## 🚀 Getting Started Locally
+## 🚀 Quick Start Guide
+
+Follow these steps to run the project locally in under 3 minutes.
 
 ### 1. Prerequisites
-- Python 3.10, 3.11, or 3.12 installed
-- Git installed
-- A Firebase project with Realtime Database enabled
+- **Python 3.10+** installed on your system ([python.org](https://www.python.org/downloads/))
+- **Git** installed ([git-scm.com](https://git-scm.com/))
 
 ### 2. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd "Monitoring System"
+git clone https://github.com/YASHP1405/College-Monitoring-System.git
+cd College-Monitoring-System
 ```
 
-### 3. Create and Activate Virtual Environment
+### 3. Create & Activate a Virtual Environment
+
 **On Windows (PowerShell):**
 ```powershell
 python -m venv venv
@@ -140,67 +220,104 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 5. Configure Environment Variables
-Copy `.env.example` to `.env`:
+### 5. Setup Environment File
+Copy the example environment file:
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
+```
+
+**macOS / Linux:**
 ```bash
 cp .env.example .env
 ```
-Open `.env` and fill in your Firebase credentials:
-```env
-DJANGO_SECRET_KEY=your-secure-random-secret-key
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
 
-FIREBASE_API_KEY=AIzaSy...
-FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-FIREBASE_DATABASE_URL=https://your-project-default-rtdb.firebaseio.com
-FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-```
+*(Optional)* You can run the app immediately with default local fallback settings, or edit `.env` to connect your live Firebase project.
 
-> **Firebase Setup Note**: In your Firebase Console, ensure your Realtime Database rules allow read/write access for your application.
-
-### 6. Initialize Database (for Django Sessions)
+### 6. Run Migrations (for Django Session Support)
 ```bash
 python manage.py migrate
 ```
 
-### 7. Run the Development Server
+### 7. Start the Development Server
 ```bash
 python manage.py runserver
 ```
-Visit `http://127.0.0.1:8000` in your web browser.
+
+Open your browser and navigate to:
+```text
+http://127.0.0.1:8000/
+```
 
 ---
 
 ## 🔑 Default Credentials
 
-On initial startup, a default super admin is automatically verified / seeded into Firebase:
+For local testing and evaluation, the database includes pre-configured demo accounts:
 
-| Role | User ID | Password |
-|---|---|---|
-| **Admin** | `admin1` | `admin123` |
+| Role | User ID / Login | Default Password | Notes |
+|---|---|---|---|
+| 🛡️ **Administrator** | `admin1` | `admin123` | Full system access to all management modules |
+| 👨‍🏫 **Teacher / Faculty** | `T01` | `teach123!` | Dr. Alan Turing (preloaded timetable) |
+| 👨‍🏫 **Teacher / Faculty** | `T02` | `teach123!` | Prof. Ada Lovelace |
+| 🖥️ **Lab Technician** | `lab1` | `lab123!` | Main Computer Science Lab |
+| 🖥️ **Lab Technician** | `lab2` | `lab123!` | Hardware & Networking Lab |
+| 🎓 **Student** | `student1` | `student123!` | Or register a new account on `/signup/` |
 
-> ⚠️ **Security Tip**: Log into the admin portal and update this password or add a dedicated administrator for production use.
+> [!IMPORTANT]
+> Change the default administrator password in production environments!
 
 ---
 
-## 🌐 Deploying to PythonAnywhere
+## 🔥 Firebase Integration Guide
 
-1. **Upload / Clone Code**:
-   Open a Bash console in PythonAnywhere:
+To connect a live Firebase Realtime Database:
+
+1. Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
+2. In the left sidebar, navigate to **Build > Realtime Database** and click **Create Database**.
+3. Under the **Rules** tab, set access rules:
+   ```json
+   {
+     "rules": {
+       ".read": true,
+       ".write": true
+     }
+   }
+   ```
+   *(Adjust security rules as needed for production).*
+4. Navigate to **Project Settings** (gear icon) > **General** > **Your apps** and add a **Web App** to find your API credentials.
+5. In Firebase **Authentication**, enable the **Google** sign-in provider if you wish to use Google login.
+6. Open your `.env` file and fill in your keys:
+   ```env
+   FIREBASE_API_KEY=AIzaSy...
+   FIREBASE_AUTH_DOMAIN=your-app.firebaseapp.com
+   FIREBASE_DATABASE_URL=https://your-app-default-rtdb.firebaseio.com
+   FIREBASE_STORAGE_BUCKET=your-app.appspot.com
+   FIREBASE_PROJECT_ID=your-app
+   ```
+7. Restart the Django server. EduMonitor will automatically connect to your live Firebase instance!
+
+---
+
+## 🌐 Deployment to PythonAnywhere
+
+EduMonitor is pre-configured for direct hosting on [PythonAnywhere](https://www.pythonanywhere.com/):
+
+1. **Clone the Repo in PythonAnywhere Bash Console**:
    ```bash
-   git clone https://github.com/<your-username>/<repo-name>.git
-   cd "Monitoring System"
+   git clone https://github.com/YASHP1405/College-Monitoring-System.git
+   cd College-Monitoring-System
    ```
 
-2. **Create Virtualenv & Install Requirements**:
+2. **Create Virtual Environment & Install Packages**:
    ```bash
-   mkvirtualenv --python=/usr/bin/python3.10 myenv
+   mkvirtualenv --python=/usr/bin/python3.10 edumonitor-env
    pip install -r requirements.txt
    ```
 
 3. **Configure Environment Variables**:
-   Create your `.env` file in the project directory with your production credentials.
+   Create a `.env` file in the project folder with your production values (`DEBUG=False`, `ALLOWED_HOSTS=<your-username>.pythonanywhere.com`).
 
 4. **Collect Static Files & Run Migrations**:
    ```bash
@@ -209,41 +326,55 @@ On initial startup, a default super admin is automatically verified / seeded int
    ```
 
 5. **Configure PythonAnywhere Web Tab**:
-   - **Source code**: `/home/<username>/Monitoring System`
-   - **Working directory**: `/home/<username>/Monitoring System`
-   - **Virtualenv**: `/home/<username>/.virtualenvs/myenv`
-   - **Static Files**:
+   - **Source code**: `/home/<username>/College-Monitoring-System`
+   - **Working directory**: `/home/<username>/College-Monitoring-System`
+   - **Virtualenv**: `/home/<username>/.virtualenvs/edumonitor-env`
+   - **Static files**:
      - URL: `/static/`
-     - Directory: `/home/<username>/Monitoring System/staticfiles`
-   - **WSGI configuration file** (edit from Web tab):
-     ```python
-     import os
-     import sys
-     from dotenv import load_dotenv
+     - Path: `/home/<username>/College-Monitoring-System/staticfiles`
 
-     path = '/home/<username>/Monitoring System'
-     if path not in sys.path:
-         sys.path.append(path)
+6. **WSGI Configuration File**:
+   Click into the WSGI configuration file link and replace the contents with:
+   ```python
+   import os
+   import sys
+   from pathlib import Path
+   from dotenv import load_dotenv
 
-     # Load environment variables
-     load_dotenv(os.path.join(path, '.env'))
+   path = '/home/<username>/College-Monitoring-System'
+   if path not in sys.path:
+       sys.path.append(path)
 
-     os.environ['DJANGO_SETTINGS_MODULE'] = 'monitoring_system.settings'
+   load_dotenv(os.path.join(path, '.env'))
+   os.environ['DJANGO_SETTINGS_MODULE'] = 'monitoring_system.settings'
 
-     from django.core.wsgi import get_wsgi_application
-     application = get_wsgi_application()
-     ```
+   from django.core.wsgi import get_wsgi_application
+   application = get_wsgi_application()
+   ```
 
-6. Click **Reload <username>.pythonanywhere.com** to go live!
+7. Click **Reload <your-username>.pythonanywhere.com** to launch!
 
 ---
 
-## 🔒 Security Best Practices
-- Keep `.env` out of version control (`.gitignore` already blocks `.env` and `*.env.local`).
-- Set `DEBUG=False` and configure `ALLOWED_HOSTS` to your actual domain in production.
-- Use strong passwords matching the complexity policy (letters, numbers, and symbols required).
+## 🔒 Security & GitHub Pre-Push Checklist
+
+Before pushing commits to GitHub, verify that sensitive files remain private:
+
+- [x] **`.env` is ignored**: Verified in `.gitignore`. Never commit API keys or production database secrets.
+- [x] **`db.sqlite3` is ignored**: Local session database remains untracked.
+- [x] **`firebase_local.json` is ignored**: Local test state stays on your development machine.
+- [x] **`venv/` is ignored**: Virtual environment dependencies are not pushed.
+- [x] **`__pycache__/` is ignored**: Compiled bytecode files are excluded.
+- [x] **`.env.example` is maintained**: Safe placeholder template provided for collaborators.
 
 ---
 
 ## 📄 License
-This project is open-source and available under the [MIT License](LICENSE).
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for complete details.
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ for academic institutions, educators, and students.</sub>
+</div>
